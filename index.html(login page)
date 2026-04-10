@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroScan - Medical Professional Login</title>
+    <link rel="stylesheet" href="login_css.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com;">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>NeuroScan</h1>
+            <p>Brain Tumor Detection System</p>
+        </div>
+
+        <form id="loginForm">
+            <input type="hidden" id="csrfToken" name="csrfToken" value="static-token-for-demo">
+            
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required 
+                       autocomplete="username" minlength="3" maxlength="20"
+                       pattern="[a-zA-Z0-9]+" title="Only alphanumeric characters allowed">
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required
+                       autocomplete="current-password" minlength="6" maxlength="20"
+                       pattern="^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$"
+                       title="Password must be 6-20 characters with at least one letter, one number and one special character">
+                <span class="password-toggle" id="togglePassword">👁️</span>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                Invalid credentials. Please try again.
+            </div>
+
+            <button type="submit" id="loginButton">Access System</button>
+            
+            <input type="hidden" id="loginAttempts" name="loginAttempts" value="0">
+            <input type="hidden" id="lastAttemptTime" name="lastAttemptTime" value="">
+        </form>
+
+        <div class="security-info">
+            <i>🔒</i> Secure medical data access. All activities are logged and monitored.
+        </div>
+    </div>
+
+    <script>
+        // Security: Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Security: Disable developer tools shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                (e.ctrlKey && e.shiftKey && e.key === 'J') || 
+                (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginAttempts = parseInt(document.getElementById('loginAttempts').value) || 0;
+            const lastAttemptTime = parseInt(document.getElementById('lastAttemptTime').value) || 0;
+            const currentTime = Date.now();
+            
+            // Rate limiting: 5 attempts per minute
+            if (loginAttempts >= 5 && (currentTime - lastAttemptTime) < 60000) {
+                document.getElementById('errorMessage').textContent = 'Too many attempts. Please wait 1 minute.';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+            
+            if (username === 'abc' && password === 'abc@123') {
+                // Clear password before redirect
+                document.getElementById('password').value = '';
+                window.location.href = 'Dashboard.html';
+            } else {
+                // Update attempt counter
+                document.getElementById('loginAttempts').value = loginAttempts + 1;
+                document.getElementById('lastAttemptTime').value = currentTime;
+                
+                document.getElementById('errorMessage').textContent = 'Invalid credentials. Please try again.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        });
+
+        // Password visibility toggle with auto-hide
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+            
+            if (type === 'text') {
+                setTimeout(() => {
+                    passwordInput.setAttribute('type', 'password');
+                    this.textContent = '👁️';
+                }, 3000);
+            }
+        });
+
+        // Security: Clear form on load
+        window.addEventListener('load', function() {
+            document.getElementById('loginForm').reset();
+        });
+
+        // Security: Prevent paste/copy in password field
+        const passwordField = document.getElementById('password');
+        passwordField.addEventListener('paste', function(e) {
+            e.preventDefault();
+        });
+        passwordField.addEventListener('copy', function(e) {
+            e.preventDefault();
+        });
+        
+        // Session timeout after 5 minutes inactivity
+        let idleTimer;
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                document.getElementById('loginForm').reset();
+                document.getElementById('errorMessage').textContent = 'Session timed out due to inactivity.';
+                document.getElementById('errorMessage').style.display = 'block';
+            }, 300000); // 5 minutes
+        }
+        
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('keypress', resetIdleTimer);
+        resetIdleTimer();
+    </script>
+</body>
+</html>
