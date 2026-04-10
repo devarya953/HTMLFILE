@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroScan | Brain Tumor Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="background" id="background"></div>
+
+    <div class="container">
+        <div class="logo animate__animated animate__fadeIn">
+            Neuro<span>Scan</span>
+        </div>
+        <p class="tagline animate__animated animate__fadeIn animate__delay-1s">
+            Advanced AI-powered Brain Tumor Detection System
+        </p>
+
+        <div id="upload-box" class="animate__animated animate__fadeIn animate__delay-1s">
+            <div class="section-title">
+                <i class="fas fa-user-circle"></i> Patient Information
+            </div>
+            
+            <div class="input-group animate__animated animate__fadeIn animate__delay-2s">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Patient's full name" required>
+                <div class="error-message" id="name-error"></div>
+            </div>
+            
+            <div class="input-group animate__animated animate__fadeIn animate__delay-2s">
+                <label for="phn">Phone Number</label>
+                <input type="text" id="phn" placeholder="Patient's phone number" required>
+                <div class="error-message" id="phn-error"></div>
+            </div>
+            
+            <div class="input-group animate__animated animate__fadeIn animate__delay-2s">
+                <label for="age">Age</label>
+                <input type="number" id="age" placeholder="Between 1-120" min="1" max="120" required>
+                <div class="error-message" id="age-error"></div>
+            </div>
+            
+            <div class="input-group animate__animated animate__fadeIn animate__delay-2s">
+                <label for="bloodType">Blood Type</label>
+                <select id="bloodType">
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-brain"></i> MRI Image Analysis
+            </div>
+            
+            <div class="file-upload-wrapper">
+                <label for="imageInput" class="file-upload-label">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Drag & drop your MRI scan or <strong>click to browse</strong></span>
+                </label>
+                <input type="file" id="imageInput" accept="image/jpeg, image/png, image/jpg">
+                <img id="preview" alt="Image Preview">
+                <div class="error-message" id="image-error"></div>
+            </div>
+            
+            <button onclick="predictTumor()" class="animate__animated animate__fadeIn animate__delay-3s">
+                <i class="fas fa-search"></i> Analyze MRI Scan
+            </button>
+            
+            <div class="loading" id="loading"></div>
+            <div class="error-message" id="api-error"></div>
+            
+            <div id="result-container">
+                <div id="result"></div>
+                <div id="confidence"></div>
+                <div class="patient-info">
+                    ID: <strong id="result-id"></strong> | 
+                    Patient: <strong id="result-name"></strong> | 
+                    Phone: <strong id="result-phn"></strong> | 
+                    Age: <strong id="result-age"></strong> | 
+                    Blood Type: <strong id="result-blood"></strong>
+                </div>
+                <button id="generate-report-btn" onclick="generateReport()">
+                    <i class="fas fa-file-alt"></i> Generate Report
+                </button>
+            </div>
+        </div>
+        
+        <footer class="animate__animated animate__fadeIn animate__delay-4s">
+            &copy; <span id="current-year"></span> NeuroScan AI Diagnostics. All rights reserved.
+        </footer>
+    </div>
+    
+    <script>
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        function createBackground() {
+            const background = document.getElementById('background');
+            const colors = [
+                'rgba(100, 150, 255, 0.4)',
+                'rgba(76, 201, 240, 0.4)',
+                'rgba(247, 100, 180, 0.4)',
+                'rgba(255, 200, 100, 0.4)'
+            ];
+            
+            for (let i = 0; i < 20; i++) {
+                const neuron = document.createElement('div');
+                neuron.className = 'neuron';
+                const size = Math.random() * 25 + 10;
+                neuron.style.width = `${size}px`;
+                neuron.style.height = `${size}px`;
+                neuron.style.left = `${Math.random() * 100}%`;
+                neuron.style.top = `${Math.random() * 100}%`;
+                neuron.style.background = colors[Math.floor(Math.random() * colors.length)];
+                neuron.style.animationDelay = `${Math.random() * 5}s`;
+                neuron.style.animationDuration = `${Math.random() * 4 + 4}s`;
+                background.appendChild(neuron);
+            }
+            
+            for (let i = 0; i < 15; i++) {
+                const axon = document.createElement('div');
+                axon.className = 'axon';
+                axon.style.width = `${Math.random() * 300 + 100}px`;
+                axon.style.left = `${Math.random() * 100}%`;
+                axon.style.top = `${Math.random() * 100}%`;
+                axon.style.transform = `rotate(${Math.random() * 360}deg)`;
+                axon.style.animationDelay = `${Math.random() * 5}s`;
+                background.appendChild(axon);
+            }
+            
+            for (let i = 0; i < 15; i++) {
+                const dendrite = document.createElement('div');
+                dendrite.className = 'dendrite';
+                dendrite.style.height = `${Math.random() * 150 + 50}px`;
+                dendrite.style.left = `${Math.random() * 100}%`;
+                dendrite.style.top = `${Math.random() * 100}%`;
+                dendrite.style.animationDelay = `${Math.random() * 5}s`;
+                background.appendChild(dendrite);
+            }
+            
+            for (let i = 0; i < 8; i++) {
+                const wave = document.createElement('div');
+                wave.className = 'brain-wave';
+                const size = Math.random() * 400 + 100;
+                wave.style.width = `${size}px`;
+                wave.style.height = `${size}px`;
+                wave.style.left = `${Math.random() * 100}%`;
+                wave.style.top = `${Math.random() * 100}%`;
+                wave.style.animationDelay = `${Math.random() * 5}s`;
+                wave.style.animationDuration = `${Math.random() * 10 + 10}s`;
+                background.appendChild(wave);
+            }
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100 + 100}%`;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.animationDuration = `${Math.random() * 30 + 20}s`;
+                background.appendChild(particle);
+            }
+        }
+
+        window.addEventListener('load', createBackground);
+
+        document.getElementById("imageInput").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                showError("image-error", "Please upload a valid JPEG or PNG image");
+                return;
+            }
+            
+            hideError("image-error");
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById("preview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                document.querySelector('.file-upload-label span').innerHTML = `<strong>${file.name}</strong> selected`;
+                preview.classList.add('animate__animated', 'animate__fadeIn');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        const uploadLabel = document.querySelector('.file-upload-label');
+        uploadLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadLabel.style.borderColor = 'var(--primary)';
+            uploadLabel.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+        });
+        
+        uploadLabel.addEventListener('dragleave', () => {
+            uploadLabel.style.borderColor = '#e0e0e0';
+            uploadLabel.style.backgroundColor = 'var(--light)';
+        });
+        
+        uploadLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadLabel.style.borderColor = '#e0e0e0';
+            uploadLabel.style.backgroundColor = 'var(--light)';
+            
+            if (e.dataTransfer.files.length) {
+                document.getElementById('imageInput').files = e.dataTransfer.files;
+                const event = new Event('change');
+                document.getElementById('imageInput').dispatchEvent(event);
+            }
+        });
+
+        function predictTumor() {
+            hideAllErrors();
+            
+            const fileInput = document.getElementById("imageInput").files[0];
+            const name = document.getElementById("name").value.trim();
+            const phn = document.getElementById("phn").value.trim();
+            const age = document.getElementById("age").value;
+            const bloodType = document.getElementById("bloodType").value;
+            
+            let isValid = true;
+            
+            if (!fileInput) {
+                showError("image-error", "Please select an MRI image first!");
+                isValid = false;
+            }
+            
+            if (!name) {
+                showError("name-error", "Please enter the patient's name");
+                isValid = false;
+            }
+            
+            if (!phn) {
+                showError("phn-error", "Please enter the patient's phone number");
+                isValid = false;
+            }
+            
+            if (!age || age < 1 || age > 120) {
+                showError("age-error", "Please enter a valid age between 1-120");
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+
+            const formData = new FormData();
+            formData.append("file", fileInput);
+            formData.append("name", name);
+            formData.append("phn", phn);
+            formData.append("age", age);
+            formData.append("bloodType", bloodType);
+
+            const loading = document.getElementById("loading");
+            const resultContainer = document.getElementById("result-container");
+            const predictButton = document.querySelector('button');
+            const apiError = document.getElementById("api-error");
+            const generateReportBtn = document.getElementById("generate-report-btn");
+            
+            loading.style.display = "block";
+            predictButton.disabled = true;
+            predictButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            resultContainer.style.display = "none";
+            apiError.style.display = "none";
+            generateReportBtn.style.display = "none";
+            
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update patient info display
+                document.getElementById("result-id").textContent = data.patient_id;
+                document.getElementById("result-name").textContent = data.name;
+                document.getElementById("result-phn").textContent = data.phone || data.phn;
+                document.getElementById("result-age").textContent = data.age;
+                document.getElementById("result-blood").textContent = data.blood_type || data.bloodType;
+                
+                // Update results
+                const resultElement = document.getElementById("result");
+                const confidenceElement = document.getElementById("confidence");
+                
+                resultElement.textContent = "Result: " + data.prediction;
+                confidenceElement.textContent = "Confidence Level: " + data.confidence;
+                
+                // Style based on result
+                if (data.prediction.toLowerCase().includes("+ve")) {
+                    resultContainer.className = "result-positive";
+                    resultElement.style.color = "var(--danger)";
+                } else {
+                    resultContainer.className = "result-negative";
+                    resultElement.style.color = "var(--success)";
+                }
+                
+                // Show results and generate report button
+                resultContainer.style.display = "block";
+                generateReportBtn.style.display = "block";
+                resultContainer.classList.add("animate__animated", "animate__fadeIn");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showError("api-error", error.message || "Error processing the image. Please try again.");
+            })
+            .finally(() => {
+                loading.style.display = "none";
+                predictButton.disabled = false;
+                predictButton.innerHTML = '<i class="fas fa-search"></i> Analyze MRI Scan';
+            });
+        }
+        
+        function generateReport() {
+            // Get all the data
+            const patientId = document.getElementById("result-id").textContent;
+            const patientName = document.getElementById("result-name").textContent;
+            const patientPhone = document.getElementById("result-phn").textContent;
+            const patientAge = document.getElementById("result-age").textContent;
+            const patientBlood = document.getElementById("result-blood").textContent;
+            const result = document.getElementById("result").textContent.replace("Result: ", "");
+            const confidence = document.getElementById("confidence").textContent.replace("Confidence Level: ", "");
+            
+            // Create URL parameters
+            const params = new URLSearchParams();
+            params.append('id', patientId);
+            params.append('name', patientName);
+            params.append('phn', patientPhone);
+            params.append('age', patientAge);
+            params.append('bloodType', patientBlood);
+            params.append('result', result);
+            params.append('confidence', confidence);
+            
+            // Open report in new tab
+            window.open('report.html?' + params.toString(), '_blank');
+        }
+        
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = "block";
+            element.classList.add("animate__animated", "animate__headShake");
+        }
+        
+        function hideError(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = "none";
+            element.textContent = "";
+        }
+        
+        function hideAllErrors() {
+            const errors = document.querySelectorAll('.error-message');
+            errors.forEach(error => {
+                error.style.display = "none";
+                error.textContent = "";
+            });
+        }
+    </script>
+</body>
+</html>
