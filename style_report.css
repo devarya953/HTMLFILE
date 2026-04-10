@@ -1,0 +1,90 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    line-height: 1.6;
+}
+.report-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #4361ee;
+    padding-bottom: 20px;
+}
+.report-title {
+    font-size: 24px;
+    color: #4361ee;
+    margin: 0;
+}
+.report-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 5px 0 0;
+}
+.report-date {
+    font-size: 14px;
+    color: #888;
+    margin-top: 10px;
+}
+.section {
+    margin-bottom: 25px;
+}
+.section-title {
+    font-size: 18px;
+    color: #4361ee;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+.patient-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.info-item {
+    margin-bottom: 10px;
+}
+.info-label {
+    font-weight: 600;
+    color: #555;
+    display: inline-block;
+    width: 120px;
+}
+.result-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.result-positive {
+    color: #e63946;
+    font-weight: 600;
+    font-size: 18px;
+}
+.result-negative {
+    color: #2a9d8f;
+    font-weight: 600;
+    font-size: 18px;
+}
+.confidence {
+    margin-top: 10px;
+    font-size: 16px;
+}
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: #888;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4361ee;
+    margin-bottom: 5px;
+}
+.logo span {
+    color: #3a0ca3;
+}
